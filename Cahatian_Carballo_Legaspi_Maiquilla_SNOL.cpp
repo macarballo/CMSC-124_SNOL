@@ -79,24 +79,6 @@ void beg_command(string key_val, unordered_map<string, string>& map, string& err
   	}
 }
 
-// Function to check the type of a given user input command
-int command_check(string user_input) {
-	if (user_input.substr(0, 3) == "BEG") {
-		// Check if the command starts with "BEG"
-    	return 1;
-	}
-	if (user_input.substr(0, 5) == "PRINT") {
-    	// Check if the command starts with "PRINT"
-    	return 2;
-  	} else if (user_input.find("BEG") != std::string::npos || user_input.find("PRINT") != std::string::npos) {
-    	// Check if the command contains "BEG" or "PRINT" anywhere in the string
-    	return 0;
- 	} else {
-    	// If none of the conditions above match, the command is unknown
-    	return 3;
-  	}
-}
-
 // Function to evaluate an ARITHMETIC OPERATIONS between two integers
 int evaluate_int(char op, int first, int sec) {
 	if (op == '+') return (sec + first); // Addition operation
@@ -116,6 +98,8 @@ string eval_post_int(string num) {
 	int first;
 	int sec;
 	int value;
+
+	bool negative = false;
 
   	for (i = 0; i < num.length(); i++) {
 	  	if (num[i] == ' ') {
@@ -249,103 +233,100 @@ int check_data_type(string result) {
   	return j; // Return the value of j, indicating the data type of the result (0 for integer, 1 for floating-point)
 }
 
-// Function to determine the OPERATOR HIERARCHY for POSTFIX EXPRESSION EVALUATION
-//int op_hierarchy(char op) {
-//	if (op == '%' return 5; // If the operator is '%', return 5 (highest priority)
-//	else if (op == '*') return 4; // If the operator is '*', return 4
-//	else if (op == '/') return 3; // If the operator is '/', return 3
-//	else if (op == '-') return 2; // If the operator is '-', return 2
-//	else if (op == '+') return 1; // If the operator is '+', return 1
-//	else return -1; // If the operator is not recognized, return -1 (lowest priority)
-//}
-
+// Function that handles the operator hierarchy
 int op_hierarchy(char op) {
-	if ((op == '%')||(op == '*')||(op == '/')) return 2; // If the operator is '%', return 2 (highest priority)
-	else if ((op == '-')||(op == '+')) return 1; // If the operator is '-', return 1
-	else return -1; // If the operator is not recognized, return -1 (lowest priority)
+	if (op == '~') { // Negative sign
+		return 4;
+	} else if (op == '%' || op == '*' || op == '/') {
+		return 2; // If the operator is '%', '*', or '/', return 2 (highest priority)
+	} else if (op == '-' || op == '+') {
+		return 1; // If the operator is '-' or '+', return 1
+	} else {
+		return -1; // If the operator is not recognized, return -1 (lowest priority)
+	}
 }
 
-// Function to EVALUATE the expressions
+// Function to evaluate the expressions
+// Function to evaluate the expressions
 string evaluate(string num) {
-	stack<char> op_stack; // Stack to store operators
+	stack<string> op_stack; // Stack to store operators and negative numbers
 	string result; // Stores the final result
 	int i;
-	
-  	num.erase(remove(num.begin(), num.end(), ' '), num.end()); // Removes whitespace from the input expression
-	  
-	for (i = 0; i < num.length(); i++) {
-    	if (num[i] != '-') {
-      		continue;
-    	}
-    	// Checks if the '-' character indicates a negative number
-    	if (i == 0 || num[i - 1] == '(' || (op_hierarchy(num[i - 1]) != -1)) {
-      		num[i] = '~'; // Replaces '-' with '~' to represent negative numbers
-    	}
-  	}
 
-  	for (i = 0; i < num.length(); i++) {
-    	if (isdigit(num[i]) || num[i] == '.') { // If the character is a digit or decimal point
-      		// Add it to the result string
-      		if (result.length() > 0 && !isdigit(result[result.length() - 1])) {
-        		if (!isspace(result[result.length() - 1]) && !(result[result.length() - 1] == '.')) {
-          			result += " "; // Add a space before adding the digit or decimal point
-        		}
-      		}
-      	result += num[i];
-    } else if (num[i] == '(') { // If the character is an opening parenthesis
-		op_stack.push('('); // Push it to the operator stack
-    } else if (isspace(num[num[i]])) { // If the character is a space
-		continue; // Skip it
-    } else if (num[i] == ')') { // If the character is a closing parenthesis
-		// Pop operators from the stack and add them to the result until an opening parenthesis is encountered
-		while (!op_stack.empty() && op_stack.top() != '(') {
-        	if (result.length() > 0 && !isspace(result[result.length() - 1])) {
-          		result += " "; // Add a space before adding the operator
-        	}
-        char placeholder = op_stack.top();
-        op_stack.pop();
-        result += placeholder;
-      	}
-      	op_stack.pop(); // Remove the opening parenthesis from the stack
-    } else { // If the character is an operator
-		if (num[i] == num[i + 1] || op_hierarchy(num[i + 1]) != -1) {
-        	return "OPERATOR ERROR"; // Return an error if there are consecutive operators or an invalid operator
-      	}
-      	if (result.length() > 0 && !isspace(result[result.length() - 1])) {
-        	result += " "; // Add a space before adding the operator
-      	}
-      	// Pop operators from the stack and add them to the result based on their hierarchy
-      	while (!op_stack.empty() && op_hierarchy(num[i]) < op_hierarchy(op_stack.top())) {
-        	char placeholder = op_stack.top();
-        	op_stack.pop();
-        	if (result.length() > 0 && !isspace(result[result.length() - 1])) {
-          		result += " "; // Add a space before adding the operator
-        	}
-        result += placeholder;
-      	}
-		op_stack.push(num[i]); // Push the current operator to the stack
-    	}
+	num.erase(remove(num.begin(), num.end(), ' '), num.end()); // Removes whitespace from the input expression
+
+	for (i = 0; i < num.length(); i++) {
+		if (num[i] == '-') {
+			if (i == 0 || num[i - 1] == '(' || op_hierarchy(num[i - 1]) != -1) {
+				// Checks if the '-' character indicates a negative number
+				num[i] = '~'; // Replaces '-' with '~' to represent negative numbers
+			}
+		}
 	}
-	
+
+	for (i = 0; i < num.length(); i++) {
+		if (isdigit(num[i]) || num[i] == '.') { // If the character is a digit or decimal point
+			// Add it to the result string
+			if (result.length() > 0 && !isdigit(result[result.length() - 1])) {
+				if (!isspace(result[result.length() - 1]) && !(result[result.length() - 1] == '.')) {
+					result += " "; // Add a space before adding the digit or decimal point
+				}
+			}
+			result += num[i];
+		} else if (num[i] == '(') { // If the character is an opening parenthesis
+			op_stack.push("("); // Push it to the operator stack
+		} else if (isspace(num[i])) { // If the character is a space
+			continue; // Skip it
+		} else if (num[i] == ')') { // If the character is a closing parenthesis
+			// Pop operators from the stack and add them to the result until an opening parenthesis is encountered
+			while (!op_stack.empty() && op_stack.top() != "(") {
+				if (result.length() > 0 && !isspace(result[result.length() - 1])) {
+					result += " "; // Add a space before adding the operator
+				}
+				string placeholder = op_stack.top();
+				op_stack.pop();
+				result += placeholder;
+			}
+			op_stack.pop(); // Remove the opening parenthesis from the stack
+		} else { // If the character is an operator
+			if (num[i] == num[i + 1] || op_hierarchy(num[i + 1]) != -1) {
+				return "OPERATOR ERROR"; // Return an error if there are consecutive operators or an invalid operator
+			}
+			if (result.length() > 0 && !isspace(result[result.length() - 1])) {
+				result += " "; // Add a space before adding the operator
+			}
+			// Pop operators from the stack and add them to the result based on their hierarchy
+			while (!op_stack.empty() && op_hierarchy(num[i]) <= op_hierarchy(op_stack.top()[0])) {
+				string placeholder = op_stack.top();
+				op_stack.pop();
+				if (result.length() > 0 && !isspace(result[result.length() - 1])) {
+					result += " "; // Add a space before adding the operator
+				}
+				result += placeholder;
+			}
+			op_stack.push(string(1, num[i])); // Push the current operator to the stack
+		}
+	}
+
 	// Add any remaining operators from the stack to the result
 	while (!op_stack.empty()) {
-    	char placeholder = op_stack.top();
-    	op_stack.pop();
-    	if (result.length() > 0 && !isspace(result[result.length() - 1])) {
-      		result += " "; // Add a space before adding the operator
-    	}
-    result += placeholder;
-  	}
+		string placeholder = op_stack.top();
+		op_stack.pop();
+		if (result.length() > 0 && !isspace(result[result.length() - 1])) {
+			result += " "; // Add a space before adding the operator
+		}
+		result += placeholder;
+	}
 
-  	// Perform the main calculation by evaluating the postfix expression
-  	int type;
-  	type = check_data_type(result); // Check if the result contains a decimal point
-  	if (type == 1) {
-    	result = eval_post_float(result); // Evaluate the postfix expression with floating-point arithmetic
-  	} else {
-    	result = eval_post_int(result); // Evaluate the postfix expression with integer arithmetic
-  	}
-  	return result; // Return the final result
+	// Perform the main calculation by evaluating the postfix expression
+	int type;
+	type = check_data_type(result); // Check if the result contains a decimal point
+	if (type == 1) {
+		result = eval_post_float(result); // Evaluate the postfix expression with floating-point arithmetic
+	} else {
+		result = eval_post_int(result); // Evaluate the postfix expression with integer arithmetic
+	}
+	return result; // Return the final result
 }
 
 // Function that CHECKS for OPERATORS
@@ -648,6 +629,36 @@ string evaluate_math(string user_input, unordered_map <string, string> map, stri
   	return result;
 }
 
+// Function to check the type of a given user input command
+int command_check(string user_input) {
+		if (user_input.substr(0, 3) == "BEG") {// Check if the command starts with "BEG"
+			if(user_input[3] == ' '){
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		
+		}
+		else if (user_input.substr(0, 5) == "PRINT") { // Check if the command starts with "PRINT"
+			//if(user_input.substr(0, 6) == " "){
+			if(user_input[5] == ' '){
+				return 2;
+			}
+			else {
+				return 0;
+			}
+		
+		} else if (user_input.find("BEG") != std::string::npos || user_input.find("PRINT") != std::string::npos) { // Check if the command contains "BEG" or "PRINT" anywhere in the string
+			
+			return 0;
+		} else { // If none of the conditions above match, the command is unknown
+			
+			return 3;
+		}
+}
+
+
 // This is the entry point of the program. It defines the main function.
 int main(){
 	// Declare several variables used in the program
@@ -693,7 +704,6 @@ int main(){
       }
       continue;
     }
-	
 	int command = command_check(user); // checks the user's command type
     if (user == "EXIT!") { // checks if the user wants to exit by entering "EXIT!"
 		cout << "\n\nInterpreter is now terminated..." << endl;
@@ -702,10 +712,11 @@ int main(){
 		error_check = "Unknown command! Does not match any valid command of the language.\n";
 		cout << "SNOL> " << error_check; // prints the error message to the console
     } else if (command == 1) { // handles the case where the command type is 1, indicating a "BEG" command
-		key_val = user.substr(4, user.length());
-		if (variable_check(key_val)) { // extracts the key value from the user input
-			beg_command(key_val, map, error_check); // calls the beg_command function to perform the corresponding action
-      	}
+			key_val = user.substr(4, user.length());
+			if (variable_check(key_val)) { // extracts the key value from the user input
+				beg_command(key_val, map, error_check); // calls the beg_command function to perform the corresponding action
+			}
+		
     } else if (command == 2) { // handles the case where the command type is 2, indicating a "PRINT" command
 		key_val = user.substr(6, user.length()); // extracts the value string from the user input 
 		eval = evaluate_number(key_val); // evaluates the type of value
