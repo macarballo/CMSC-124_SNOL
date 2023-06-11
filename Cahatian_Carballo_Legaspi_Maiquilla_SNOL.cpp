@@ -422,7 +422,8 @@ bool assignment_check(string assign_input, string &user_input, string &expr) {
     expr = assign_input.substr(position_equal + 1, assign_input.length() - user_input.length()); // Stores the right-hand side of the assignment
     // Removes the spaces
     user_input = regex_replace(user_input, regex("^ +| +$|( ) +"), "$1"); // Removes leading, trailing, and extra spaces in the left-hand side
-    expr = regex_replace(expr, regex("^ +| +$|( ) +"), "$1"); // Removes leading, trailing, and extra spaces in the right-hand side
+    //expr = regex_replace(expr, regex("^ +| +$|( ) +"), "$1"); // Removes leading, trailing, and extra spaces in the right-hand side
+    expr.erase(remove(expr.begin(), expr.end(), ' '), expr.end()); // Removes whitespace  in the right-hand side
     return true;
 	} else {
     return false;
