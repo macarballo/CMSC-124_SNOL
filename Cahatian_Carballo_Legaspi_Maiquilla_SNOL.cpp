@@ -15,8 +15,6 @@
 #include <unordered_map> // allows efficient storage and retrieval of key-value pairs
 #include <stack> // provides the implementation of a stack data structure
 #include <deque> // provides the implementation of a deque (double-ended queue) data structure
-#include <sstream>
-#include <cctype>
 using namespace std;
 
 // Function to PRINT the value associated with a given key in a map
@@ -56,18 +54,18 @@ void BEG_command(string key_val, unordered_map<string, string>& map, string& err
 	
 	// Read user input from the console
 	getline(cin, user_input);
+	
 	// Check if the user input is not an integer, float, or any valid command
 	if (determine_number_type(user_input) == 3) {
 		// If the input does not match any valid command or numeric value, set an error message
-		error_check = "Invalid input! must be numeric literal value!.\n";
+		error_check = "Invalid input! Must be a numeric literal value!\n";
 		cout << "SNOL> "<< error_check; 
-  	}
-	else{
-			// Check if an error occurred during evaluation
-  	if (error_check != "0") {
-    	// If an error message is set, return without modifying the map
-    	return;
-  	}
+  	} else{
+		// Check if an error occurred during evaluation
+	  	if (error_check != "0") {
+	    	// If an error message is set, return without modifying the map
+	    	return;
+	  	}
 
   	// Check if the key exists in the map
   	if (map.find(key_val) == map.end()) {
@@ -76,10 +74,8 @@ void BEG_command(string key_val, unordered_map<string, string>& map, string& err
   	} else {
     	// If the key is found, update the existing value in the map
     	map[key_val] = user_input;
-  	}
-	}
-
-  
+  		}
+	}  
 }
 
 // Function to PERFORM an INTEGER OPERATION
@@ -652,38 +648,27 @@ string evaluateExpression(string user_input, unordered_map <string, string> map,
 // Function to check the type of a given user input command
 int command_check(string user_input) {
 		if(user_input.substr(0, 3) == "BEG" && user_input.length()<=3){
-			
-			cout << "SNOL> Invalid input! must have a variable.\n"; 
-
-		}
-		else if(user_input.substr(0, 5) == "PRINT" && user_input.length()<=5){
-			cout << "SNOL> Invalid input! must have a variable.\n"; 
-
-		}
-		else if (user_input.substr(0, 3) == "BEG") {// Check if the command starts with "BEG"
+			cout << "SNOL> Invalid input! Must have a variable.\n"; 
+		} else if(user_input.substr(0, 5) == "PRINT" && user_input.length()<=5){
+			cout << "SNOL> Invalid input! Must have a variable.\n"; 
+		} else if (user_input.substr(0, 3) == "BEG") {// Check if the command starts with "BEG"
 			if(user_input[3] == ' '){
 				return 1;
-			}
-			else {
+			} else {
 				return 0;
 			}
-		
-		}
-		else if (user_input.substr(0, 5) == "PRINT") { // Check if the command starts with "PRINT"
+		} else if (user_input.substr(0, 5) == "PRINT") { // Check if the command starts with "PRINT"
 			if(user_input[5] == ' '){
 				return 2;
-			}
-			else {
+			} else {
 				return 0;
 			}
-		
 		} else if (user_input.find("BEG") != std::string::npos || user_input.find("PRINT") != std::string::npos) { // Check if the command contains "BEG" or "PRINT" anywhere in the string
-			
 			return 0;
 		} else { // If none of the conditions above match, the command is unknown
-			
 			return 3;
 		}
+	return 0;
 }
 
 
@@ -732,7 +717,9 @@ int main(){
       }
       continue;
     }
+    
 	int command = command_check(user); // checks the user's command type
+	
     if (user == "EXIT!") { // checks if the user wants to exit by entering "EXIT!"
 		cout << "\n\nInterpreter is now terminated..." << endl;
 		return 0;  // terminates the program
