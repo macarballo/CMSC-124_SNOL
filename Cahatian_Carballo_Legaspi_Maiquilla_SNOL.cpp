@@ -1,7 +1,7 @@
 /*
 	Simple Number-Only Language (SNOL) Program
 	
-	Program Information: This is a simplied custom programming language that utilizes C++ as its interpreter.
+	Program Information: This is a simplified custom programming language that utilizes C++ as its interpreter.
 	This custom programming language could perform certain programming languages concepts such as data type 
 	identification, variable assignment, and arithmetic operations.
 	
@@ -20,7 +20,7 @@
 using namespace std;
 
 // Function to PRINT the value associated with a given key in a map
-void print_command(string key_val, unordered_map<string, string>& map, string& error_check) {
+void PRINT_command(string key_val, unordered_map<string, string>& map, string& error_check) {
 	// Check if the key exists in the map
 	if (map.find(key_val) == map.end()) {
 		// If the key is not found, set the error_check string with an error message
@@ -31,9 +31,8 @@ void print_command(string key_val, unordered_map<string, string>& map, string& e
 	}
 }
 
-
-// Function to EVALUATE the type of a given NUMBER STRING
-int evaluate_number(string num) {
+// Function to DETERMINE the type of a given NUMBER STRING
+int determine_number_type(string num) {
 	int type = 3; // Returns 3 if not integer or float
 	// Check if the number matches the pattern for an integer
 	if (regex_match(num, regex("[+-]?[0-9]+"))) {
@@ -50,7 +49,7 @@ int evaluate_number(string num) {
 }
 
 // Function to handle the BEG command, which prompts the user to enter a value for a given key and stores it in a map
-void beg_command(string key_val, unordered_map<string, string>& map, string& error_check) {
+void BEG_command(string key_val, unordered_map<string, string>& map, string& error_check) {
 	string user_input;
 	cout << "SNOL> Please enter value for [" << key_val << "]: " << endl;
 	cout << "Input: ";
@@ -59,7 +58,7 @@ void beg_command(string key_val, unordered_map<string, string>& map, string& err
 	getline(cin, user_input);
 	
 	// Check if the user input is not an integer, float, or any valid command
-	if (evaluate_number(user_input) == 3) {
+	if (determine_number_type(user_input) == 3) {
 		// If the input does not match any valid command or numeric value, set an error message
 		error_check = "Unknown command! Does not match any valid command of the language.\n";
   	}
@@ -79,18 +78,32 @@ void beg_command(string key_val, unordered_map<string, string>& map, string& err
   	}
 }
 
-// Function to evaluate an ARITHMETIC OPERATIONS between two integers
-int evaluate_int(char op, int first, int sec) {
-	if (op == '+') return (sec + first); // Addition operation
-	else if (op == '-') return (sec - first); // Subtraction operation
-	else if (op == '*') return (sec * first); // Multiplication operation
-	else if (op == '/') return (sec / first); // Division operation
-	else if (op == '%') return (sec % first); // Modulo operation
-	else return 0; // Invalid operation
+// Function to PERFORM an INTEGER OPERATION
+int perform_integer_operation(char op, int first, int sec) {
+	switch(op){
+		case '+':
+			return sec + first; // Addition operation
+			break;
+		case '-':
+			return sec - first; // Subtraction operation
+			break;
+		case '*':
+			return sec * first; // Multiplication operation
+			break;
+		case '/':
+			return sec / first; // Division operation
+			break;
+		case '%':
+			return sec % first; // Modulo operation
+			break;
+		default: // Invalid operation
+			return 0;
+			break;
+	}
 }
 
 // Function to evaluate a POSTFIX EXPRESSION containing integers
-string eval_post_int(string num) {
+string evaluate_postfix_expression_integers(string num) {
 	stringstream stream;
 	stack <int> operands; // Stores the numbers for evaluation
 	string results; // Stores the results
@@ -120,7 +133,7 @@ string eval_post_int(string num) {
     	operands.pop(); // Removes the first operand from the stack
     	sec = operands.top(); // Retrieves the second operand from the stack
     	operands.pop(); // Removes the second operand from the stack
-		value = evaluate_int(num[i], first, sec); // Evaluates the arithmetic operation using the operator and operands
+		value = perform_integer_operation(num[i], first, sec); // Evaluates the arithmetic operation using the operator and operands
 		operands.push(value); // Pushes the result back onto the operands stack
     }
   }
@@ -135,7 +148,7 @@ string eval_post_int(string num) {
 }
 
 // Function to evaluate an ARITHMETIC OPERATIONS between two DOUBLE-PRECISION FLOATING-NUMBER numbers
-double evaluate_double(char op, double first, double sec) {
+double perform_double_operation(char op, double first, double sec) {
 	switch (op) {
         case '+':
             return sec + first; // Addition operation
@@ -155,8 +168,8 @@ double evaluate_double(char op, double first, double sec) {
     }
 }
 
-// Function to evaluate a POSTFIX EXPRESSION containing FLOATING-POINT numbers
-string eval_post_float(string num) {
+// Function to evaluate a POSTFIX EXPRESSION containing FLOATING-POINT/DOUBLE numbers
+string evaluate_postfix_expression_double(string num) {
 	ostringstream stream;
 	stream.precision(10);
 	stack <double> operands; // Stores the numbers for evaluation
@@ -206,7 +219,7 @@ string eval_post_float(string num) {
       		operands.pop(); // Removes the first operand from the stack
       		sec = operands.top(); // Retrieves the second operand from the stack
       		operands.pop(); // Removes the second operand from the stack
-      		value = evaluate_double(num[i], first, sec); // Evaluates the arithmetic operation using the operator and operands
+      		value = perform_double_operation(num[i], first, sec); // Evaluates the arithmetic operation using the operator and operands
       		operands.push(value); // Pushes the result back onto the operands stack
     	}
 	}	
@@ -233,8 +246,8 @@ int check_data_type(string result) {
   	return j; // Return the value of j, indicating the data type of the result (0 for integer, 1 for floating-point)
 }
 
-// Function that handles the operator hierarchy
-int op_hierarchy(char op) {
+// Function to GET OPERATOR PRIORITY
+int get_operator_priority(char op) {
 	if (op == '~') { // Negative sign
 		return 4;
 	} else if (op == '%' || op == '*' || op == '/') {
@@ -247,7 +260,7 @@ int op_hierarchy(char op) {
 }
 
 // Function to evaluate the expressions
-string evaluate(string num) {
+string evaluate_expression(string num) {
 	stack<string> op_stack; // Stack to store operators and negative numbers
 	string result; // Stores the final result
 	int i;
@@ -256,7 +269,7 @@ string evaluate(string num) {
 
 	for (i = 0; i < num.length(); i++) {
 		if (num[i] == '-') {
-			if (i == 0 || num[i - 1] == '(' || op_hierarchy(num[i - 1]) != -1) {
+			if (i == 0 || num[i - 1] == '(' || get_operator_priority(num[i - 1]) != -1) {
 				// Checks if the '-' character indicates a negative number
 				num[i] = '~'; // Replaces '-' with '~' to represent negative numbers
 			}
@@ -288,14 +301,14 @@ string evaluate(string num) {
 			}
 			op_stack.pop(); // Remove the opening parenthesis from the stack
 		} else { // If the character is an operator
-			if (num[i] == num[i + 1] || op_hierarchy(num[i + 1]) != -1) {
+			if (num[i] == num[i + 1] || get_operator_priority(num[i + 1]) != -1) {
 				return "OPERATOR ERROR"; // Return an error if there are consecutive operators or an invalid operator
 			}
 			if (result.length() > 0 && !isspace(result[result.length() - 1])) {
 				result += " "; // Add a space before adding the operator
 			}
 			// Pop operators from the stack and add them to the result based on their hierarchy
-			while (!op_stack.empty() && op_hierarchy(num[i]) <= op_hierarchy(op_stack.top()[0])) {
+			while (!op_stack.empty() && get_operator_priority(num[i]) <= get_operator_priority(op_stack.top()[0])) {
 				string placeholder = op_stack.top();
 				op_stack.pop();
 				if (result.length() > 0 && !isspace(result[result.length() - 1])) {
@@ -321,9 +334,9 @@ string evaluate(string num) {
 	int type;
 	type = check_data_type(result); // Check if the result contains a decimal point
 	if (type == 1) {
-		result = eval_post_float(result); // Evaluate the postfix expression with floating-point arithmetic
+		result = evaluate_postfix_expression_double(result); // Evaluate the postfix expression with floating-point arithmetic
 	} else {
-		result = eval_post_int(result); // Evaluate the postfix expression with integer arithmetic
+		result = evaluate_postfix_expression_integers(result); // Evaluate the postfix expression with integer arithmetic
 	}
 	return result; // Return the final result
 }
@@ -355,7 +368,7 @@ string check_duplicate_var(int &var_type, string &operand, unordered_map<string,
       		return "false"; // Returns "false" to indicate that the variable is not a duplicate
     	}	
     operand = map[operand]; // Retrieves the value of the variable from the map
-    var_type = evaluate_number(operand); // Evaluates the type of the variable (integer, float, or other)
+    var_type = determine_number_type(operand); // Evaluates the type of the variable (integer, float, or other)
     return "true"; // Returns "true" to indicate that the variable is a duplicate
   	} else {
     	error_check = "Error! [" + operand + "] is not defined!\n"; // Sets the error message indicating that the variable is not defined
@@ -369,10 +382,10 @@ bool parse(unordered_map<string, string> map, int &var_type, string num, deque<s
     	error_check = "Unknown command! Does not match any valid command of the language.\n";
     	return false;
   	} else if (var_type == 0) { // Checks for expressions
-	  	var_type = evaluate_number(num); // Evaluates the type of the expression
+	  	var_type = determine_number_type(num); // Evaluates the type of the expression
     		if (var_type == 3) { // If the expression is a variable
       			if (check_duplicate_var(var_type, num, map, error_check) == "true") { // Checks if the variable is a duplicate
-        			var_type = evaluate_number(num); // Re-evaluates the type of the variable
+        			var_type = determine_number_type(num); // Re-evaluates the type of the variable
         			if (num[0] == '-') {
           				equation.push_back("( " + num + " )"); // Adds the variable to the equation with parentheses if it's negative
         			} else {
@@ -386,10 +399,10 @@ bool parse(unordered_map<string, string> map, int &var_type, string num, deque<s
     		}
     		equation.push_back(num); // Adds the expression to the equation
     		return true;
-  	} else if (evaluate_number(num) == 3) { // Checks for variable names
+  	} else if (determine_number_type(num) == 3) { // Checks for variable names
     	int temp = var_type;
     		if (check_duplicate_var(var_type, num, map, error_check) == "true") { // Checks if the variable is a duplicate
-      			if (temp == evaluate_number(num)) { // Checks if the operands have the same type
+      			if (temp == determine_number_type(num)) { // Checks if the operands have the same type
         			if (num[0] == '-') {
           				equation.push_back("( " + num + " )"); // Adds the variable to the equation with parentheses if it's negative
         			} else {
@@ -404,7 +417,7 @@ bool parse(unordered_map<string, string> map, int &var_type, string num, deque<s
 				error_check = "Error! [" + num + "] is not defined!\n";
 				return false;
     		}
-	} else if (var_type == evaluate_number(num)) { // Checks for numbers
+	} else if (var_type == determine_number_type(num)) { // Checks for numbers
     	equation.push_back(num); // Adds the number to the equation
     	return true;
   	} else {
@@ -416,7 +429,7 @@ bool parse(unordered_map<string, string> map, int &var_type, string num, deque<s
 }
 
 // Function that CHECKS for ASSIGNMENTS
-bool assignment_check(string assign_input, string &user_input, string &expr) {
+bool check_assignment(string assign_input, string &user_input, string &expr) {
 	if ((assign_input.find("=") != std::string::npos)) { // Checks if the assignment input contains an equal sign
     // Extracts the assignment
 	int position_equal = assign_input.find('=');
@@ -433,7 +446,7 @@ bool assignment_check(string assign_input, string &user_input, string &expr) {
 }
 
 // Function that CONVERTS the arithmetic expression into a valid expression
-string evaluate_math(string user_input, unordered_map <string, string> map, string &error_check) {
+string evaluateExpression(string user_input, unordered_map <string, string> map, string &error_check) {
 	stack <char> z;
 	deque <string> equation; // Stores the converted expressions
 	string placeholder;
@@ -628,7 +641,7 @@ string evaluate_math(string user_input, unordered_map <string, string> map, stri
     	placeholder += result + " "; //  appends the result string and a space character to the placeholder string.
     	equation.pop_front(); // after processing the front element, this line removes it from the equation vector using the pop_front() function
   	}
-  	string result = evaluate(placeholder);
+  	string result = evaluate_expression(placeholder);
   	return result;
 }
 
@@ -683,9 +696,9 @@ int main(){
 	  cout << "\nCommand: ";
 	  getline(cin, user); // prompt the user to enter a command and read the input from the console into the user variable
 	  user = regex_replace(user, regex("^ +| +$|( ) +"), "$1"); // uses regular expressions to remove leading and trailing spaces from the user input
-	  	if (assignment_check(user, user_var, expr)) { // checks if the user's command is an assignment statement
+	  	if (check_assignment(user, user_var, expr)) { // checks if the user's command is an assignment statement
 			if (variable_check(user_var)){ //  checks if the variable name (user_var) in the assignment statement is valid
-        		expr = evaluate_math(expr, map, error_check); // Evaluates the mathematic expression "expr"
+        		expr = evaluateExpression(expr, map, error_check); // Evaluates the mathematic expression "expr"
         	if (expr == "ERROR") { // indicates that the command is unknown
           		error_check = "Unknown command! Does not match any valid command of the language.\n";
         } if (error_check != "0") { // checks if there is an error message 
@@ -717,12 +730,12 @@ int main(){
     } else if (command == 1) { // handles the case where the command type is 1, indicating a "BEG" command
 			key_val = user.substr(4, user.length());
 			if (variable_check(key_val)) { // extracts the key value from the user input
-				beg_command(key_val, map, error_check); // calls the beg_command function to perform the corresponding action
+				BEG_command(key_val, map, error_check); // calls the BEG_command function to perform the corresponding action
 			}
 		
     } else if (command == 2) { // handles the case where the command type is 2, indicating a "PRINT" command
 		key_val = user.substr(6, user.length()); // extracts the value string from the user input 
-		eval = evaluate_number(key_val); // evaluates the type of value
+		eval = determine_number_type(key_val); // evaluates the type of value
 		switch (eval) {
 			case 1:
 			case 2:
@@ -730,7 +743,7 @@ int main(){
 				break;
 			case 3:
 				if (variable_check(key_val)) {
-					print_command(key_val, map, error_check);
+					PRINT_command(key_val, map, error_check);
           		}
           		break;
       	}
@@ -738,7 +751,7 @@ int main(){
 			cout << "SNOL> "<< error_check;
     	}
 	} else if (command == 3) { // handles the case where the command type is 3, indicating an EXPRESSION to be EVALUATED
-		expr = evaluate_math(user, map, error_check); // evaluate the expression
+		expr = evaluateExpression(user, map, error_check); // evaluate the expression
 			if(expr == "ERROR") { // If command is unknown
 				error_check = "Unknown command! Does not match any valid command of the language.\n";
       		} else if (error_check != "0") { // More specified error
