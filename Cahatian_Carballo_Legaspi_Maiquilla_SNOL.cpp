@@ -33,7 +33,7 @@ void PRINT_command(string key_val, unordered_map<string, string>& map, string& e
 
 // Function to DETERMINE the type of a given NUMBER STRING
 int determine_number_type(string num) {
-	int type; // Returns 3 if not integer or float
+	int type =3; // Returns 3 if not integer or float
 	// Check if the number matches the pattern for an integer
 	if (regex_match(num, regex("[+-]?[0-9]+"))) {
 		// If the number matches the integer pattern, set type to 1
@@ -45,7 +45,7 @@ int determine_number_type(string num) {
 		type = 2;
 	}
 	// Return the determined type of the number
-	return type =3;
+	return type;
 }
 
 // Function to handle the BEG command, which prompts the user to enter a value for a given key and stores it in a map
@@ -59,11 +59,11 @@ void BEG_command(string key_val, unordered_map<string, string>& map, string& err
 	// Check if the user input is not an integer, float, or any valid command
 	if (determine_number_type(user_input) == 3) {
 		// If the input does not match any valid command or numeric value, set an error message
-		error_check = "Invalid input! must be numeric/literal value!.\n";
+		error_check = "Invalid input! must be numeric literal value!.\n";
 		cout << "SNOL> "<< error_check; 
   	}
-	
-	// Check if an error occurred during evaluation
+	else{
+			// Check if an error occurred during evaluation
   	if (error_check != "0") {
     	// If an error message is set, return without modifying the map
     	return;
@@ -77,6 +77,8 @@ void BEG_command(string key_val, unordered_map<string, string>& map, string& err
     	// If the key is found, update the existing value in the map
     	map[key_val] = user_input;
   	}
+	}
+
   
 }
 
