@@ -247,7 +247,6 @@ int op_hierarchy(char op) {
 }
 
 // Function to evaluate the expressions
-// Function to evaluate the expressions
 string evaluate(string num) {
 	stack<string> op_stack; // Stack to store operators and negative numbers
 	string result; // Stores the final result
@@ -339,11 +338,14 @@ bool operator_check(char op) {
 }
 
 // Function that CHECKS if VARIABLE is VALID
+// Follows the EBNF rule: letter{(letter|digit)}
 bool variable_check(string user_input) {
 	if (regex_match(user_input, regex("[a-zA-Z][a-zA-Z0-9]*")) && user_input != "BEG" && user_input != "PRINT") { // Checks if the user_input is a valid variable name
     	return true; // Returns true if user_input is a valid variable name
-  	}
-  	return false; // Returns false if user_input is not a valid variable name
+  	} else {
+  		cout << "SNOL> Invalid variable detected! Can't execute command!" << endl;
+  		return false; // Returns false if user_input is not a valid variable name
+	} 	
 }
 
 // Function that CHECKS if VARIABLE already EXISTS. If it does, then OVERWRITE.
