@@ -33,7 +33,7 @@ void PRINT_command(string key_val, unordered_map<string, string>& map, string& e
 
 // Function to DETERMINE the type of a given NUMBER STRING
 int determine_number_type(string num) {
-	int type = 3; // Returns 3 if not integer or float
+	int type; // Returns 3 if not integer or float
 	// Check if the number matches the pattern for an integer
 	if (regex_match(num, regex("[+-]?[0-9]+"))) {
 		// If the number matches the integer pattern, set type to 1
@@ -45,7 +45,7 @@ int determine_number_type(string num) {
 		type = 2;
 	}
 	// Return the determined type of the number
-	return type;
+	return type =3;
 }
 
 // Function to handle the BEG command, which prompts the user to enter a value for a given key and stores it in a map
@@ -56,13 +56,14 @@ void BEG_command(string key_val, unordered_map<string, string>& map, string& err
 	
 	// Read user input from the console
 	getline(cin, user_input);
-	
 	// Check if the user input is not an integer, float, or any valid command
 	if (determine_number_type(user_input) == 3) {
 		// If the input does not match any valid command or numeric value, set an error message
-		error_check = "Unknown command! Does not match any valid command of the language.\n";
+		error_check = "Invalid input! must be numeric/literal value!.\n";
+		cout << "SNOL> "<< error_check; 
   	}
-  	// Check if an error occurred during evaluation
+	
+	// Check if an error occurred during evaluation
   	if (error_check != "0") {
     	// If an error message is set, return without modifying the map
     	return;
@@ -76,6 +77,7 @@ void BEG_command(string key_val, unordered_map<string, string>& map, string& err
     	// If the key is found, update the existing value in the map
     	map[key_val] = user_input;
   	}
+  
 }
 
 // Function to PERFORM an INTEGER OPERATION
@@ -647,7 +649,16 @@ string evaluateExpression(string user_input, unordered_map <string, string> map,
 
 // Function to check the type of a given user input command
 int command_check(string user_input) {
-		if (user_input.substr(0, 3) == "BEG") {// Check if the command starts with "BEG"
+		if(user_input.substr(0, 3) == "BEG" && user_input.length()<=3){
+			
+			cout << "SNOL> Invalid input! must have a variable.\n"; 
+
+		}
+		else if(user_input.substr(0, 5) == "PRINT" && user_input.length()<=5){
+			cout << "SNOL> Invalid input! must have a variable.\n"; 
+
+		}
+		else if (user_input.substr(0, 3) == "BEG") {// Check if the command starts with "BEG"
 			if(user_input[3] == ' '){
 				return 1;
 			}
@@ -657,7 +668,6 @@ int command_check(string user_input) {
 		
 		}
 		else if (user_input.substr(0, 5) == "PRINT") { // Check if the command starts with "PRINT"
-			//if(user_input.substr(0, 6) == " "){
 			if(user_input[5] == ' '){
 				return 2;
 			}
